@@ -17,9 +17,11 @@ main() {
 
 }
 
-# update certificates
-echo "Updating CA certificates"
-update-ca-certificates
+# prepare CA bundle (includes any custom CAs provided via env vars)
+echo "Preparing CA bundle"
+copy_custom_certificate_from_environment_variable "OPENDUT_CUSTOM_CA1"
+copy_custom_certificate_from_environment_variable "OPENDUT_CUSTOM_CA2"
+refresh_ca_bundle
 
 # configure http proxy for Docker in Docker container (cruizba/ubuntu-dind)
 /opt/dind_proxy.sh

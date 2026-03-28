@@ -5,7 +5,7 @@ ARG cannelloni_version=1.1.0
 ENV TARGET_TRIPLE=x86_64-unknown-linux-gnu
 
 # Install OS package dependencies. We need:
-#   - `ca-certificates` for `update-ca-certificates` command used during EDGAR Setup
+#   - `ca-certificates` for the system CA bundle
 #   - `can-utils` for `cangw` command used by EDGAR Service
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends \

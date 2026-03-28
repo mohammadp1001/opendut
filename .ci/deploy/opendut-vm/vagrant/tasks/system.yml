@@ -31,7 +31,25 @@
 
 - name: Update ca certificates
   become: true
-  shell: "update-ca-certificates"
+  shell: |
+    set -e
+
+    bundle="/etc/ssl/certs/opendut-ca-bundle.crt"
+    base_bundle="/etc/ssl/certs/ca-certificates.crt"
+
+    cat "$base_bundle" > "$bundle"
+
+    if [ -f /usr/local/share/ca-certificates/insecure-development-ca.crt ]; then
+      echo >> "$bundle"
+      cat /usr/local/share/ca-certificates/insecure-development-ca.crt >> "$bundle"
+    fi
+
+    if [ -f /usr/local/share/ca-certificates/custom_root_ca.crt ]; then
+      echo >> "$bundle"
+      cat /usr/local/share/ca-certificates/custom_root_ca.crt >> "$bundle"
+    fi
+
+    printf 'export SSL_CERT_FILE=%s\n' "$bundle" > /etc/profile.d/opendut-ca.sh
   when: development_ca_copy_task.changed or custom_root_ca_task.changed
 
 - name: Create custom cargo target directory

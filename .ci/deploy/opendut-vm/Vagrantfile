@@ -104,7 +104,7 @@ TERMINAL_OUTPUT
             puts "Custom root CA found. Adding to VM."
             config.vm.provision "file", source: "#{custom_root_ca}", destination: "/tmp/custom_root_ca.crt"
             config.vm.provision "shell" do |s|
-               s.inline = "cp /tmp/custom_root_ca.crt /usr/local/share/ca-certificates; update-ca-certificates"
+               s.inline = "cp /tmp/custom_root_ca.crt /usr/local/share/ca-certificates/custom_root_ca.crt && cat /etc/ssl/certs/ca-certificates.crt /usr/local/share/ca-certificates/custom_root_ca.crt > /etc/ssl/certs/opendut-ca-bundle.crt && printf 'export SSL_CERT_FILE=/etc/ssl/certs/opendut-ca-bundle.crt\\n' > /etc/profile.d/opendut-ca.sh"
                s.privileged = true
             end
         end

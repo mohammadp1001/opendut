@@ -5,8 +5,28 @@ copy_custom_certificate_from_environment_variable() {
   custom_ca_variable_name="$1"
   if [ -n "${!custom_ca_variable_name}" ]; then
     echo -e "${!custom_ca_variable_name}" > /usr/local/share/ca-certificates/opendut_custom_ca_"${custom_ca_variable_name}".crt
-    update-ca-certificates
   fi
+}
+
+refresh_ca_bundle() {
+  # create a CA bundle that includes the system bundle and any provided OpenDUT custom CAs
+  local base_bundle="/etc/ssl/certs/ca-certificates.crt"
+  local out_bundle="/etc/ssl/certs/opendut-ca-bundle.crt"
+
+  if [ -f "$base_bundle" ]; then
+    cat "$base_bundle" > "$out_bundle"
+  else
+    : > "$out_bundle"
+  fi
+
+  for crt in /usr/local/share/ca-certificates/opendut_custom_ca_*.crt; do
+    if [ -f "$crt" ]; then
+      echo >> "$out_bundle"
+      cat "$crt" >> "$out_bundle"
+    fi
+  done
+
+  export SSL_CERT_FILE="$out_bundle"
 }
 append_data_from_env_variable() {
   var_name="$1"
@@ -28,6 +48,7 @@ die_with_success() {
 echo "Preparing opendut certificates ..."
 copy_custom_certificate_from_environment_variable "OPENDUT_CUSTOM_CA1"
 copy_custom_certificate_from_environment_variable "OPENDUT_CUSTOM_CA2"
+refresh_ca_bundle
 append_data_from_env_variable OPENDUT_HOSTS /etc/hosts
 
 trap die_with_success TERM

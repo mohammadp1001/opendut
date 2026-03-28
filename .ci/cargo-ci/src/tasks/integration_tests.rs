@@ -64,7 +64,7 @@ fn run_edgar_integration_test_binary_in_docker(edgar_test_binary: String) -> any
      - Network administration capabilities (CAP_ADD NET_ADMIN)
      - Root privileges
      - iproute2 package for `ip` command
-     - ca-certificates package for `update-ca-certificates` command
+     - ca-certificates package for the system CA bundle
      */
 
     let mut docker = Command::new("docker");
